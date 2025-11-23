@@ -99,6 +99,22 @@ app.patch("/artworks/like/:id", async (req, res) => {
   res.send(result);
 });
 
+//  Add to Favorites
+app.post("/favorites", async (req, res) => {
+  const favorite = req.body;
+  const exists = await favoritesCollection.findOne({
+    userEmail: favorite.userEmail,
+    artworkId: favorite.artworkId,
+  });
+  if (exists) {
+    return res.status(409).send({ message: "Already added" });
+  }
+  const result = await favoritesCollection.insertOne(favorite);
+  res.send(result);
+});
+
+
+
 app.listen(port, () => {
   console.log(` Server is running on port ${port}`);
 });

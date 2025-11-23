@@ -89,7 +89,15 @@ app.get("/artworks/:id", async (req, res) => {
   const result = await artworksCollection.findOne({ _id: new ObjectId(id) });
   res.send(result);
 });
-
+//  Like Artwork
+app.patch("/artworks/like/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await artworksCollection.updateOne(
+    { _id: new ObjectId(id) },
+    { $inc: { likes: 1 } }
+  );
+  res.send(result);
+});
 
 app.listen(port, () => {
   console.log(` Server is running on port ${port}`);

@@ -83,6 +83,12 @@ app.post("/artworks", async (req, res) => {
   }
 });
 
+//  Get single artwork by ID
+app.get("/artworks/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await artworksCollection.findOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
 
 
 app.listen(port, () => {

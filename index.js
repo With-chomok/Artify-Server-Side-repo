@@ -113,6 +113,20 @@ app.post("/favorites", async (req, res) => {
   res.send(result);
 });
 
+//  Update artwork
+app.put("/artworks/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const { ObjectId } = require("mongodb");
+
+  const result = await artworksCollection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: data }
+  );
+
+  res.send(result);
+});
+
 
 
 app.listen(port, () => {

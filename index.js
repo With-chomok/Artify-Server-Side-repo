@@ -139,6 +139,26 @@ app.delete("/artworks/:id", async (req, res) => {
   res.send(result);
 });
 
+// Get favorites by user email
+app.get("/favorites",midlleware, async (req, res) => {
+  try {
+    const email = req.query.email;
+
+    if (!email) {
+      return res.status(400).send({ error: "Email is required" });
+    }
+
+    const result = await favoritesCollection
+      .find({ userEmail: email })
+      .toArray();
+
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Failed to fetch favorites" });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(` Server is running on port ${port}`);

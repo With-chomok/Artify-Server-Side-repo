@@ -1,27 +1,51 @@
-const express = require("express")
+const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
+const admin = require("firebase-admin");
+const serviceAccount = require("./sdkKey.json");
 
 const cors = require("cors");
-
+const { log } = require("console");
+const { decode } = require("punycode");
 const app = express();
 const port = process.env.PORT || 5000;
 
-
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 app.use(express.json());
 app.use(cors());
-
+// MongoDB connection string
 const uri =
   "mongodb+srv://artify-db:BbSLdW5YgYrjHdwM@dipol-database-cluster.fbp5e4u.mongodb.net/?appName=DIPOL-DATABASE-CLUSTER";
 
-  const client = new MongoClient(uri, {
+const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
 });
+
+const midlleware = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({
+      message: "unauthorized access.Token not found!",
+    });
+  }
+  const token = authorization.split(" ")[1];
+
+  try {
+    await admin.auth().verifyIdToken(token);
+    console.log(decode);
+    next();
+  } catch (error) {
+    res.status(401).send({
+      message: "unauthorized access",
+    });
+  }
+};
 
 async function run() {
   try {
@@ -37,17 +61,12 @@ async function run() {
 }
 
 run();
-app.get("/", (req, res) => {
-  res.send("Server is running fine!");
-});
-
 
 // Routes
 
 app.get("/", (req, res) => {
   res.send("Server is running fine!");
 });
-
 
 app.get("/artworks", async (req, res) => {
   try {
@@ -140,7 +159,7 @@ app.delete("/artworks/:id", async (req, res) => {
 });
 
 // Get favorites by user email
-app.get("/favorites",midlleware, async (req, res) => {
+app.get("/favorites", midlleware, async (req, res) => {
   try {
     const email = req.query.email;
 
@@ -158,7 +177,11 @@ app.get("/favorites",midlleware, async (req, res) => {
     res.status(500).send({ error: "Failed to fetch favorites" });
   }
 });
-
+app.delete("/favorites/:id", midlleware, async (req, res) => {
+  const id = req.params.id;
+  const result = await favoritesCollection.deleteOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
 
 app.listen(port, () => {
   console.log(` Server is running on port ${port}`);

@@ -42,8 +42,46 @@ app.get("/", (req, res) => {
 });
 
 
+// Routes
+
+app.get("/", (req, res) => {
+  res.send("Server is running fine!");
+});
 
 
+app.get("/artworks", async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 6;
+    const artworks = await artworksCollection
+      .find({ visibility: "Public" })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .toArray();
+
+    res.send(artworks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Failed to fetch artworks" });
+  }
+});
+
+app.get("/artworks-explore", async (req, res) => {
+  const result = await artworksCollection
+    .find({ visibility: "Public" })
+    .toArray();
+  res.send(result);
+});
+
+app.post("/artworks", async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await artworksCollection.insertOne(data);
+    res.send({ success: true, result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Failed to add artwork" });
+  }
+});
 
 
 

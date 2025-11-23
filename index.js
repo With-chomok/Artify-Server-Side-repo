@@ -127,6 +127,17 @@ app.put("/artworks/:id", async (req, res) => {
   res.send(result);
 });
 
+//  Delete artwork
+app.delete("/artworks/:id", async (req, res) => {
+  const id = req.params.id;
+  const { ObjectId } = require("mongodb");
+
+  const result = await artworksCollection.deleteOne({
+    _id: new ObjectId(id),
+  });
+
+  res.send(result);
+});
 
 
 app.listen(port, () => {

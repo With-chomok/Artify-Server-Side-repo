@@ -15,7 +15,13 @@ admin.initializeApp({
 });
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin:[
+    "https://artify-client-side.vercel.app","http://localhost:5174","http://localhost:5173"
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
 // MongoDB connection string
 const uri =
@@ -51,11 +57,11 @@ const midlleware = async (req, res, next) => {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const db = client.db("artworksCollection");
     artworksCollection = db.collection("artworks");
     favoritesCollection = db.collection("favorites");
-
+    // await client.db("admin").command({ ping: 1});
     console.log(" MongoDB connected successfully!");
   } catch (err) {
     console.error(" MongoDB connection error:", err);
@@ -134,6 +140,20 @@ app.post("/favorites", async (req, res) => {
   res.send(result);
 });
 
+
+app.get("/artworks", async(req, res) => {
+  try{
+    const email = req.query.email;
+    let query = {};
+    if(email){
+      query = {userEmail: email};
+    }
+    const artworks = await artworksCollection.find(query).toArray();
+    res.send(artworks);
+  }catch(error){
+    res.send({ message: "Server Error" });
+  }
+})
 //  Update artwork
 app.put("/artworks/:id", async (req, res) => {
   const id = req.params.id;
@@ -147,6 +167,8 @@ app.put("/artworks/:id", async (req, res) => {
 
   res.send(result);
 });
+
+
 
 //  Delete artwork
 app.delete("/artworks/:id", async (req, res) => {

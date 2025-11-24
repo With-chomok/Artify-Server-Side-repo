@@ -1,6 +1,7 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const admin = require("firebase-admin");
+require("dotenv").config()
 const serviceAccount = require("./sdkKey.json");
 
 const cors = require("cors");
@@ -15,9 +16,10 @@ admin.initializeApp({
 
 app.use(express.json());
 app.use(cors());
+
 // MongoDB connection string
 const uri =
-  "mongodb+srv://artify-db:BbSLdW5YgYrjHdwM@dipol-database-cluster.fbp5e4u.mongodb.net/?appName=DIPOL-DATABASE-CLUSTER";
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@dipol-database-cluster.fbp5e4u.mongodb.net/?appName=DIPOL-DATABASE-CLUSTER`;
 
 const client = new MongoClient(uri, {
   serverApi: {

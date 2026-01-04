@@ -78,7 +78,7 @@ app.get("/", (req, res) => {
 
 app.get("/artworks", async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 6;
+    const limit = parseInt(req.query.limit) || 8;
     const artworks = await artworksCollection
       .find({ visibility: "Public" })
       .sort({ createdAt: -1 })

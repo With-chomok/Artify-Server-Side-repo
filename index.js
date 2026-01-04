@@ -9,7 +9,6 @@ const { log } = require("console");
 const { decode } = require("punycode");
 const app = express();
 const port = process.env.PORT || 5000;
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -26,9 +25,10 @@ app.use(cors({
 // MongoDB connection string
 const uri =
   `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@dipol-database-cluster.fbp5e4u.mongodb.net/?appName=DIPOL-DATABASE-CLUSTER`;
-
-const client = new MongoClient(uri, {
-  serverApi: {
+  console.log(process.env.DB_PASSWORD);
+  
+  const client = new MongoClient(uri, {
+    serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
@@ -82,7 +82,7 @@ app.get("/artworks", async (req, res) => {
     const artworks = await artworksCollection
       .find({ visibility: "Public" })
       .sort({ createdAt: -1 })
-      .limit(6)
+      .limit(8)
       .toArray();
 
     res.send(artworks);
@@ -149,7 +149,7 @@ app.get("/artworks", async(req, res) => {
       query = {userEmail: email};
     }
     const artworks = await artworksCollection.find(query).toArray();
-    res.send(artworks);
+    res.send(artworks);     
   }catch(error){
     res.send({ message: "Server Error" });
   }
